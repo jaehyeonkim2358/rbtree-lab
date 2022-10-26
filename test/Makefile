@@ -1,6 +1,6 @@
 .PHONY: test
 
-CFLAGS=-I ../src -Wall -g #-DSENTINEL
+CFLAGS=-I ../src -Wall -g -DSENTINEL
 
 test: test-rbtree
 	./test-rbtree
@@ -8,7 +8,7 @@ test: test-rbtree
 
 test-rbtree: test-rbtree.o ../src/rbtree.o
 
-../src/rbtree.o:
+../src/rbtree.o: ../src/rbtree.h ../src/rbtree.c
 	$(MAKE) -C ../src rbtree.o
 
 clean:
