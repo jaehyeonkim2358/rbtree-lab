@@ -172,8 +172,10 @@ node_t *rbtree_insert(rbtree *t, const key_t key) {
 }
 
 /**
- * KEY를 갖는 node의 pointer를 T에서 찾아 return.
- * T에 KEY를 갖는 node가 존재하지 않으면 NULL을 return.
+ * T에서 KEY를 갖는 node의 pointer를 찾는 함수.
+ * 
+ * KEY를 갖는 node가 존재하면 node를 return.
+ * KEY를 갖는 node가 존재하지 않으면 NULL을 return.
 */
 node_t *rbtree_find(const rbtree *t, const key_t key) {
   node_t *cursor = t->root;
@@ -195,7 +197,7 @@ node_t *rbtree_find(const rbtree *t, const key_t key) {
 }
 
 /**
- * CURSOR가 root인 subtree에서 최소 key값을 갖는 node를 return.
+ * CURSOR가 root인 subtree에서 최소 key값을 갖는 node를 return하는 함수.
 */
 node_t *subtree_min(node_t *cursor, node_t *nil) {
   node_t *min = cursor;
@@ -207,14 +209,14 @@ node_t *subtree_min(node_t *cursor, node_t *nil) {
 }
 
 /**
- * T에서 key값이 최소인 node를 return.
+ * T에서 key값이 최소인 node를 return하는 함수.
 */
 node_t *rbtree_min(const rbtree *t) {
   return subtree_min(t->root, t->nil);
 }
 
 /**
- * CURSOR가 root인 subtree에서 최대 key값을 갖는 node를 return.
+ * CURSOR가 root인 subtree에서 최대 key값을 갖는 node를 return하는 함수.
 */
 node_t *subtree_max(node_t *cursor, node_t *nil) {
   node_t *max = cursor;
@@ -226,14 +228,14 @@ node_t *subtree_max(node_t *cursor, node_t *nil) {
 }
 
 /**
- * T에서 key값이 최대인 node를 return.
+ * T에서 key값이 최대인 node를 return하는 함수.
 */
 node_t *rbtree_max(const rbtree *t) {
   return subtree_max(t->root, t->nil);
 }
 
 /**
- * 부모와의 관계에서, old_child를 new_child로 대체하는 함수
+ * 부모와의 관계에서, old_child를 new_child로 대체하는 함수.
 */
 void trans_plant(rbtree *t, node_t *old_child, node_t *new_child) {
   if(old_child->parent == t->nil) {
@@ -305,7 +307,7 @@ void rbtree_erase_fixup(rbtree *t, node_t *cursor) {
 }
 
 /**
- * T에서 TARGET node를 삭제하는 함수
+ * T에서 TARGET node를 삭제하는 함수.
 */
 int rbtree_erase(rbtree *t, node_t *target) {
   node_t *y = target;
