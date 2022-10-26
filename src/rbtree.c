@@ -3,6 +3,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+/**
+ * RB tree 구조체 생성 함수
+*/
 rbtree *new_rbtree(void) {
   rbtree *p = (rbtree *)calloc(1, sizeof(rbtree));
 
@@ -19,6 +22,10 @@ rbtree *new_rbtree(void) {
   return p;
 }
 
+/**
+ * node N을 root로 갖고 NIL을 sentinel로 하는 RB tree의 
+ * NIL을 제외한 모든 node에 할당된 메모리를 반환하는 함수.
+*/
 void delete_sub_node(node_t *n, node_t *nil) {
   if(n==nil) return;
   delete_sub_node(n->left, nil);
@@ -27,6 +34,11 @@ void delete_sub_node(node_t *n, node_t *nil) {
   n=NULL;
 }
 
+/**
+ * RB tree 구조체가 차지했던 메모리를 반환하는 함수.
+ * 
+ * T가 사용한 모든 메모리를 반환한다.
+*/
 void delete_rbtree(rbtree *t) {
   delete_sub_node(t->root, t->nil);
 
@@ -37,6 +49,10 @@ void delete_rbtree(rbtree *t) {
   t = NULL;
 }
 
+/**
+ * T의 node X와 X의 right child를 rotate 하는 함수
+ * 이진 탐색 트리의 특성은 유지된다.
+*/
 void left_rotate(rbtree *t, node_t *x) {
   node_t *y = x->right;
   x->right = y->left;
@@ -55,6 +71,10 @@ void left_rotate(rbtree *t, node_t *x) {
   x->parent = y;
 }
 
+/**
+ * T의 node X와 X의 left child를 rotate 하는 함수
+ * 이진 탐색 트리의 특성은 유지된다.
+*/
 void right_rotate(rbtree *t, node_t *x) {
   node_t *y = x->left;
   x->left = y->right;
@@ -73,6 +93,9 @@ void right_rotate(rbtree *t, node_t *x) {
   x->parent = y;
 }
 
+/**
+ * T에 node를 insert한 후 rbtree 특성을 복구하는 함수.
+*/
 void rbtree_insert_fixup(rbtree *t, node_t *n) {
   while(n->parent->color == RBTREE_RED) {
     if(n->parent == n->parent->parent->left) {
@@ -112,6 +135,9 @@ void rbtree_insert_fixup(rbtree *t, node_t *n) {
   t->root->color = RBTREE_BLACK;
 }
 
+/**
+ * KEY를 갖는 node를 생성하여 T에 insert하는 함수.
+*/
 node_t *rbtree_insert(rbtree *t, const key_t key) {
   node_t *newNode = (node_t *)calloc(1, sizeof(node_t));
   newNode->key = key;
@@ -126,20 +152,14 @@ node_t *rbtree_insert(rbtree *t, const key_t key) {
       tmp = tmp->right;
     }
   }
+
   newNode->parent = parentNode;
 
-  /**
-   * 3가지 경우
-   * 
-   * 1. parentNode가 nil인 경우 (newNode가 root)
-   * 2. newNode가 parentNode의 왼쪽 자식 노드인 경우
-   * 3. newNode가 parentNode의 오른쪽 자식 노드인 경우
-   */
-  if(parentNode == t->nil) {
+  if(parentNode == t->nil) {                      // 1. parentNode가 nil인 경우 (newNode가 root)
     t->root = newNode;
-  } else if(newNode->key < parentNode->key) {
+  } else if(newNode->key < parentNode->key) {     // 2. newNode가 parentNode의 왼쪽 자식 노드인 경우
     parentNode->left = newNode;
-  } else {
+  } else {                                        // 3. newNode가 parentNode의 오른쪽 자식 노드인 경우
     parentNode->right = newNode;
   }
 
@@ -152,6 +172,10 @@ node_t *rbtree_insert(rbtree *t, const key_t key) {
   return newNode;
 }
 
+/**
+ * KEY를 갖는 node의 pointer를 T에서 찾아 return.
+ * T에 KEY를 갖는 node가 존재하지 않으면 NULL을 return.
+*/
 node_t *rbtree_find(const rbtree *t, const key_t key) {
   node_t *cur = t->root;
   while(cur != t->nil) {
@@ -171,6 +195,10 @@ node_t *rbtree_find(const rbtree *t, const key_t key) {
   }
 }
 
+/**
+ * N을 root로 하는 subtree에서 최소 key값을 갖는 node를 return.
+ * sentinel을 NIL로 설정한다.
+*/
 node_t *node_min(node_t *n, node_t *nil) {
   node_t *min = n;
   while(n != nil) {
@@ -180,21 +208,36 @@ node_t *node_min(node_t *n, node_t *nil) {
   return min;
 }
 
-node_t *rbtree_min(const rbtree *t) {
-  node_t *min = node_min(t->root, t->nil);
-  return min;
-}
-
-node_t *rbtree_max(const rbtree *t) {
-  node_t *max = t->root;
-  node_t *cur = t->root;
-  while(cur != t->nil) {
-    max = cur;
-    cur = cur->right;
+/**
+ * N을 root로 하는 subtree에서 최대 key값을 갖는 node를 return.
+ * sentinel을 NIL로 설정한다.
+*/
+node_t *node_max(node_t *n, node_t *nil) {
+  node_t *max = n;
+  while(n != nil) {
+    max = n;
+    n = n->right;
   }
   return max;
 }
 
+/**
+ * T에서 최소 key값을 갖는 node를 return.
+*/
+node_t *rbtree_min(const rbtree *t) {
+  return node_min(t->root, t->nil);
+}
+
+/**
+ * T에서 최대 key값을 갖는 node를 return.
+*/
+node_t *rbtree_max(const rbtree *t) {
+  return node_max(t->root, t->nil);
+}
+
+/**
+ * U와 U의 parent node와의 관계에서 U를 V로 대체하는 함수
+*/
 void trans_plant(rbtree *t, node_t *u, node_t *v) {
   if(u->parent == t->nil) {
     t->root = v;
@@ -206,6 +249,9 @@ void trans_plant(rbtree *t, node_t *u, node_t *v) {
   v->parent = u->parent;
 }
 
+/**
+ * T의 node를 erase한 후 rbtree 특성을 복구하는 함수.
+*/
 void rbtree_erase_fixup(rbtree *t, node_t *cursor) {
   while(cursor != t->root && cursor->color == RBTREE_BLACK) {
     if(cursor == cursor->parent->left) {
@@ -261,13 +307,10 @@ void rbtree_erase_fixup(rbtree *t, node_t *cursor) {
   cursor->color = RBTREE_BLACK;
 }
 
-void node_free(node_t *n) {
-  free(n);
-  n = NULL;
-}
-
+/**
+ * T에서 TARGET node를 삭제하는 함수
+*/
 int rbtree_erase(rbtree *t, node_t *target) {
-  // TODO: implement erase
   node_t *y = target;
   color_t y_color = y->color;
 
@@ -279,20 +322,50 @@ int rbtree_erase(rbtree *t, node_t *target) {
     tmp = target->left;
     trans_plant(t, target, target->left);
   } else {
-    y = node_min(target->right, t->nil);
+
+    /** case 1
+        target의 자리를 right subtree의 min node로 대체 **/
+    // y = node_min(target->right, t->nil);
+    /** end of case 1 **/
+
+    /** case 2 
+        target의 자리를 left subtree의 max node로 대체 **/
+    y = node_max(target->left, t->nil);
+    /** end of case 2 **/
+
     y_color = y->color;
-    tmp = y->right;
+
+    /** case 1
+        target의 자리를 right subtree의 min node로 대체 **/
+    // tmp = y->right;
+    // if(y->parent == target) {
+    //   tmp->parent = y;
+    // } else {
+    //   trans_plant(t, y, y->right);
+    //   y->right = target->right;
+    //   y->right->parent = y;
+    // }
+    // trans_plant(t, target, y);
+    // y->left = target->left;
+    // y->left->parent = y;
+    // y->color = target->color;
+    /** end of case 1 **/
+
+    /** case 2
+        target의 자리를 left subtree의 max node로 대체 **/
+    tmp = y->left;
     if(y->parent == target) {
       tmp->parent = y;
     } else {
-      trans_plant(t, y, y->right);
-      y->right = target->right;
-      y->right->parent = y;
+      trans_plant(t, y, y->left);
+      y->left = target->left;
+      y->left->parent = y;
     }
     trans_plant(t, target, y);
-    y->left = target->left;
-    y->left->parent = y;
+    y->right = target->right;
+    y->right->parent = y;
     y->color = target->color;
+    /** end of case 2 **/
   }
 
   free(target);
@@ -309,16 +382,24 @@ int rbtree_erase(rbtree *t, node_t *target) {
   return 0;
 }
 
-void get_array(node_t *n, node_t *nil, key_t *arr, int *index) {
-  if(n == nil) return;
-  get_array(n->left, nil, arr, index);
-  arr[(*index)++] = n->key;
-  get_array(n->right, nil, arr, index);
+/**
+ * CUR를 root node로 갖는 subtree의 모든 node를 오름차순으로 ARR에 저장하는 함수.
+ * sentinel을 NIL로 설정하고, INDEX는 ARR에 저장을 시작할 첫번째 인덱스로 지정한다.
+*/
+void get_array(node_t *cur, node_t *nil, key_t *arr, int *index) {
+  if(cur == nil) return;
+  get_array(cur->left, nil, arr, index);
+  arr[(*index)++] = cur->key;
+  get_array(cur->right, nil, arr, index);
 }
 
+/**
+ * T의 node를 배열 ARR에 오름차순으로 저장하는 함수.
+ * N은 배열 ARR의 크기이다.
+*/
 int rbtree_to_array(const rbtree *t, key_t *arr, const size_t n) {
   int *index = calloc(1, sizeof(int));
-  get_array(t->root, t->nil, arr, index);
+  get_array(t->root, t->nil, &arr[0], index);
   free(index);
   return 0;
 }
